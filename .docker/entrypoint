@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set +e
+
+echo "⚙️ Testing DB connection"
+timeout 300s waitfortcp "$RAILS_DB_HOST" "$RAILS_DB_PORT"
+echo "✅ DB is ready"
+
+if [ "$RAILS_ENV" != "production" ]; then
+  echo "⚙️ Performing migrations"
+  bundle exec rake db:migrate
+  echo "✅ Migrations done"
+else
+  echo "↪️ Skipping migrations because RAILS_ENV='$RAILS_ENV'"
+fi
+
+echo "➡️ Handing control over to '$*''"
+
+# shellcheck disable=SC2068
+exec bundle exec $@

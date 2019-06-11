@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+  app: &app
+    build:
+      context: .
+      target: dev
+    env_file: .docker/app.env
+    depends_on:
+    - db
+    - mail
+    - cache
+    ports:
+    - 3000
+    # volumes:
+    # - './:/app'
+
+  worker:
+    <<: *app
+    command: [ rake, 'jobs:work' ]
+
+  # Dependencies
+
+  mail:
+    build:
+      context: .
+      target: base
+    command: [ mailcatcher, -f, --ip, '0.0.0.0' ]
+    ports:
+    - 1080
+
+  cache:
+    image: memcached:latest
+    command: [ memcached, -l, '0.0.0.0', -p, '11211' ]
+
+  db:
+    image: mysql:5.6
+    env_file: .docker/mysql.env
+    volumes:
+    - db:/var/lib/mysql
+
+volumes:
+  db:
+

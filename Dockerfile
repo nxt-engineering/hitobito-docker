@@ -1,0 +1,57 @@
+FROM ruby:2.3 as base
+
+WORKDIR /app/hitobito/
+
+RUN apt-get update && apt-get install -y \
+    graphviz \
+    imagemagick \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY hitobito/Gemfile hitobito/Gemfile.lock ./
+RUN bundle install
+
+WORKDIR /app/
+COPY ./ ./
+
+RUN ln -s /app/.docker/entrypoint /bin/entrypoint; \
+    ln -s /app/.docker/waitfortcp /bin/waitfortcp
+
+WORKDIR /app/hitobito/
+RUN cp Wagonfile.ci Wagonfile && bundle install
+
+####################################################################
+FROM base as dev
+
+ENV RAILS_ENV=development
+
+ENTRYPOINT [ "/bin/entrypoint" ]
+CMD [ "rails", "server", "-b", "0.0.0.0" ]
+
+####################################################################
+FROM dev as test
+
+ENV RAILS_ENV=test
+ENTRYPOINT [ "/bin/entrypoint" ]
+CMD [ "rspec" ]
+
+####################################################################
+FROM ruby:2.6-alpine3.9 as prod
+
+WORKDIR /app/hitobito
+COPY hitobito/Gemfile hitobito/Gemfile.lock ./
+RUN bundle install \
+      --deployment \
+      --frozen \
+      --without=test \
+      --without=development \
+      --without=concolse \
+      --without=metrics
+
+COPY .docker/entrypoint .docker/waitfortcp /bin/
+
+COPY hitobito/ ./
+
+ENV RAILS_ENV=production
+
+ENTRYPOINT [ "bundle", "exec" ]
+CMD [ "rails", "serve" ]
