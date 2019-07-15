@@ -1,23 +1,26 @@
 FROM ruby:2.3 as base
 
-WORKDIR /app/hitobito/
-
 RUN apt-get update && apt-get install -y \
     graphviz \
     imagemagick \
  && rm -rf /var/lib/apt/lists/*
 
-COPY hitobito/Gemfile hitobito/Gemfile.lock ./
-RUN bundle install
-
-WORKDIR /app/
-COPY ./ ./
-
 RUN ln -s /app/.docker/entrypoint /bin/entrypoint; \
     ln -s /app/.docker/waitfortcp /bin/waitfortcp
 
 WORKDIR /app/hitobito/
-RUN cp Wagonfile.ci Wagonfile && bundle install
+COPY hitobito/Wagonfile.ci ./Wagonfile
+COPY hitobito/Gemfile hitobito/Gemfile.lock ./
+RUN bundle install
+
+ENV HITOBITO_WAGONS ""
+COPY .docker/Wagonfile ./
+
+WORKDIR /app/
+COPY ./ ./
+
+WORKDIR /app/hitobito/
+RUN bundle install
 
 ####################################################################
 FROM base as dev

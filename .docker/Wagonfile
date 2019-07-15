@@ -1,0 +1,6 @@
+group :development do
+  ENV.fetch('HITOBITO_WAGONS', '').split(',').each do |wagon_name|
+    wagon_name = wagon_name.strip
+    gem wagon_name, path: "../#{wagon_name}"
+  end
+end

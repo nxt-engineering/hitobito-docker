@@ -11,8 +11,8 @@ services:
     - cache
     ports:
     - 3000
-    # volumes:
-    # - './:/app'
+    volumes:
+    - ./:/app:ro
 
   worker:
     <<: *app
