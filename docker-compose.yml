@@ -29,10 +29,7 @@ services:
       target: test
     depends_on:
     - db
-    - sphinx
     env_file: .docker/app.env
-    volumes:
-    - sphinx:/app/hitobito/db/sphinx/development/
 
   # Dependencies
 
