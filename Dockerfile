@@ -34,6 +34,7 @@ CMD [ "rails", "server", "-b", "0.0.0.0" ]
 FROM dev as test
 
 ENV RAILS_ENV=test
+
 ENTRYPOINT [ "/bin/entrypoint" ]
 CMD [ "rspec" ]
 

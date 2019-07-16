@@ -4,19 +4,35 @@ services:
     build:
       context: .
       target: dev
-    env_file: .docker/app.env
     depends_on:
     - db
     - mail
     - cache
+    - worker
+    env_file: .docker/app.env
     ports:
     - 3000
     volumes:
-    - ./:/app:ro
+    - ./:/app
 
   worker:
     <<: *app
     command: [ rake, 'jobs:work' ]
+    depends_on:
+    - db
+    - mail
+    - cache
+
+  test:
+    build:
+      context: .
+      target: test
+    depends_on:
+    - db
+    - sphinx
+    env_file: .docker/app.env
+    volumes:
+    - sphinx:/app/hitobito/db/sphinx/development/
 
   # Dependencies
 
@@ -29,15 +45,35 @@ services:
     - 1080
 
   cache:
-    image: memcached:latest
+    image: memcached:1.5-alpine
     command: [ memcached, -l, '0.0.0.0', -p, '11211' ]
+
+  sphinx:
+    image: macbre/sphinxsearch:3.1.1
+    depends_on:
+    - db
+    volumes:
+    - sphinx:/opt/sphinx/index
+    - ./.docker/sphinx.conf:/opt/sphinx/conf/sphinx.conf:ro
+
+  indexer:
+    image: macbre/sphinxsearch:3.1.1
+    command: [ indexer, --config, /opt/sphinx/conf/sphinx.conf, --all ]
+    depends_on:
+    - db
+    volumes:
+    - sphinx:/opt/sphinx/index
+    - ./.docker/sphinx.conf:/opt/sphinx/conf/sphinx.conf:ro
 
   db:
     image: mysql:5.6
     env_file: .docker/mysql.env
     volumes:
     - db:/var/lib/mysql
+    command:
+    - --sort_buffer_size=2M
 
 volumes:
   db:
+  sphinx:
 

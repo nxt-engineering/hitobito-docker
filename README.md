@@ -73,5 +73,24 @@ The hitobito application has a lot of rspec tests.
 To run them all, use the following command:
 
 ```bash
-docker-compose run --rm app rspec
+docker-compose run --rm test
 ```
+
+## Full-text search
+
+Hitobito relies on Sphinx Search for indexing Persons, Events and Groups.
+
+At first, you need to create the initial index:
+
+```bash
+docker-compose run --rm indexer
+```
+
+Then you can start the Sphinx server:
+
+```bash
+docker-compose up sphinx
+```
+
+The server does not automatically re-index.
+In order to re-index, run the indexer again.
