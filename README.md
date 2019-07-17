@@ -50,13 +50,14 @@ echo "http://$(docker-compose port mail 1080)"
 
 ## First Login
 
-Use the password reset flow and use the e-mail address of the root account.
-You find it as `root_email` in the `settings.yml` file of the wagon.
+Get the login information via the Rails console.
 
-Then open the mailcatcher and copy the path.
-**Don't forget to adjust the host & port in that url!**
+```bash
+echo 'p=Person.first; p.update(password: "password"); "You can now login as #{p.email} with the password \"password\""' | \
+     docker-compose run --rm -T app rails c
+```
 
-Now you should be able to log-in.
+Now you should be able to log-in with the email address in the output and the password _password_.
 
 ## Debug
 
@@ -74,6 +75,19 @@ To run them all, use the following command:
 
 ```bash
 docker-compose run --rm test
+```
+
+### Test of a specific Wagon
+
+To test a specific wagon, you need to cd to the directory.
+But because the `entrypoint` script automatically does a `bundle exec` for you (which is fine most of the time), you need to overwrite the entrypoint to be plain `bash`.
+
+```bash
+$ docker-compose run --rm --entrypoint bash test
+Starting hitobito_db-test_1 ... done
+root@a42b42c42d42:/app/hitobito# rake db:migrate wagon:migrate # if you changed the db schema
+root@a42b42c42d42:/app/hitobito# cd ../hitobito_WAGON/
+root@a42b42c42d42:/app/hitobito_WAGON# rspec
 ```
 
 ## Full-text search

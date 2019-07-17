@@ -3,16 +3,27 @@
 set +e
 
 echo "⚙️ Testing DB connection"
-timeout 300s waitfortcp "$RAILS_DB_HOST" "$RAILS_DB_PORT"
+timeout 300s waitfortcp "${RAILS_DB_HOST-db}" "${RAILS_DB_PORT-3306}"
 echo "✅ DB is ready"
 
 if [ "$RAILS_ENV" != "production" ]; then
   echo "⚙️ Performing migrations"
-  bundle exec rake db:migrate
-  bundle exec rake wagon:migrate
+  bundle exec rake db:migrate wagon:migrate
   echo "✅ Migrations done"
 else
   echo "↪️ Skipping migrations because RAILS_ENV='$RAILS_ENV'"
+fi
+
+if [ "$RAILS_ENV" == "development" ]; then
+  if [ ! -f /seed/done ]; then
+    echo "⚙️ Seeding DB"
+    bundle exec rake db:seed wagon:seed && date > /seed/done
+    echo "✅ Seeding done"
+  else
+    echo "↪️ Skipping seeding because already done on $(cat /seed/done)"
+  fi
+else
+  echo "↪️ Skipping seeding because RAILS_ENV='$RAILS_ENV'"
 fi
 
 echo "➡️ Handing control over to '$*''"

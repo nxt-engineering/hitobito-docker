@@ -4,6 +4,7 @@
 **/.git
 **/.gitignore
 **/.editorconfig
+**/.code-workspace
 **/.project
 **/.travis.yml
 **/AUTHORS

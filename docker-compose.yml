@@ -8,12 +8,12 @@ services:
     - db
     - mail
     - cache
-    - worker
     env_file: .docker/app.env
     ports:
     - 3000
     volumes:
     - ./:/app
+    - seed:/seed
 
   worker:
     <<: *app
@@ -28,8 +28,13 @@ services:
       context: .
       target: test
     depends_on:
-    - db
+    - db-test
     env_file: .docker/app.env
+    environment:
+      RAILS_DB_NAME: hitobito_test
+      RAILS_DB_HOST: db-test
+    volumes:
+    - ./:/app
 
   # Dependencies
 
@@ -64,13 +69,22 @@ services:
 
   db:
     image: mysql:5.6
+    command:
+    - --sort_buffer_size=2M
     env_file: .docker/mysql.env
     volumes:
     - db:/var/lib/mysql
+
+  db-test:
+    image: mysql:5.6
     command:
     - --sort_buffer_size=2M
+    env_file: .docker/mysql.env
+    environment:
+      MYSQL_DATABASE: hitobito_test
 
 volumes:
   db:
   sphinx:
+  seed:
 
