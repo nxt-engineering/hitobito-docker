@@ -29,18 +29,6 @@ drwxr-xr-x 27 user  864 Jun 11 09:30 hitobito_generic
 drwxr-xr-x 29 user  928 Jul 15 09:43 hitobito_insieme
 ```
 
-### Exposed Ports
-
-The `docker-compose.yml` file does expose all relevant ports.
-But it does not assign them a well-known port.
-This means, that it is _intentionally_ not possible to access the main application using `http://localhost:3000`!
-Either you use `docker-compose ps` (or the `docker-compose port SERVICE PORTNUMBER` command) to get the actual port Docker assigned – or you use something like [Reception](https://github.com/nxt-engineering/reception).
-
-Why would you need this _Reception_ thingy? Because it makes all the services accessible through a reverse proxy that is accessible using `http://SERVICENAME.PROJECTNAME.docker` (or `http://SERVICENAME.PROJECTNAME.local` on Linux).
-This makes work more convenient and allows to have multiple projects, that all bind to the same port (e.g. `3000`), running at the same time.
-(Because Docker will handle the port conflict for us.)
-As an extra you get an overview over all running services and their exposed ports for free at `http://reception.docker` (or `http://reception.local` on linux).
-
 ## Docker Runtime
 
 The simplest way to work on hitobito is to use Docker:
@@ -55,6 +43,18 @@ echo "http://$(docker-compose port app 3000)"
 # In order to "receive" emails, open mailcatcher:
 echo "http://$(docker-compose port mail 1080)"
 ```
+
+### Exposed Ports
+
+The `docker-compose.yml` file does expose all relevant ports.
+But it does not assign them a well-known port.
+This means, that it is _intentionally_ not possible to access the main application using `http://localhost:3000`!
+Either you use `docker-compose ps` (or the `docker-compose port SERVICE PORTNUMBER` command) to get the actual port Docker assigned – or you use something like [Reception](https://github.com/nxt-engineering/reception).
+
+Why would you need this _Reception_ thingy? Because it makes all the services accessible through a reverse proxy that is accessible using `http://SERVICENAME.PROJECTNAME.docker` (or `http://SERVICENAME.PROJECTNAME.local` on Linux).
+This makes work more convenient and allows to have multiple projects, that all bind to the same port (e.g. `3000`), running at the same time.
+(Because Docker will handle the port conflict for us.)
+As an extra you get an overview over all running services and their exposed ports for free at `http://reception.docker` (or `http://reception.local` on linux).
 
 ## First Login
 
