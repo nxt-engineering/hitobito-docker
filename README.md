@@ -46,7 +46,7 @@ As an extra you get an overview over all running services and their exposed port
 The simplest way to work on hitobito is to use Docker:
 
 ```bash
-# Every other time
+# Start the application
 docker-compose up app
 
 # Open the app:
