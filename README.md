@@ -32,8 +32,7 @@ git clone https://github.com/hitobito/hitobito.git
 git clone https://github.com/hitobito/hitobito_generic.git
 ```
 
-You need to set up at least one wagon project.
-
+You need to set up at least one wagon project. Don't forget to [copy the Wagonfile](https://github.com/hitobito/hitobito/blob/master/doc/development/04_wagons.md#grundlegendes) in the core project!
 The final structure should look something like this:
 
 ```bash
