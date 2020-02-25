@@ -1,4 +1,4 @@
-FROM ruby:2.3 as base
+FROM ruby:2.5 as base
 
 RUN apt-get update && apt-get install -y \
     graphviz \
